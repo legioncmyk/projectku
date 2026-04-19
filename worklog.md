@@ -172,3 +172,32 @@ Stage Summary:
 - Favicon + logo created and integrated in header/footer
 - Category tabs in nominal selection UI
 - Free Fire, PUBG, MLBB at top of game list
+
+---
+Task ID: 6
+Agent: Main
+Task: Fix order button, nominal prices from Rp1.000, responsive layout
+
+Work Log:
+- Fixed "Buat Pesanan" button: changed from global store `loading` to local `submitLoading` state
+  - Root cause: global store loading could conflict with admin dashboard polling
+  - Now uses isolated `useState(false)` for submit loading
+- Deleted all 565 nominals and inserted 692 new nominals
+  - ALL 65 games now have cheapest item at exactly Rp1.000
+  - Price ranges from Rp1.000 to Rp9.200.000
+  - Free Fire: 5 DM = Rp1.000, then up to 73100 DM = Rp9.200.000
+  - PUBG: 10 UC = Rp1.000, up to 8100 UC = Rp1.500.000
+  - MLBB: 1 DM = Rp1.000, up to 4390 DM = Rp1.298.000
+- Added mobile sticky bottom bar with price + "Pesan" button
+  - Shows selected nominal name and price
+  - Fixed at bottom on mobile (lg:hidden), always accessible
+  - Added pb-24 on game view to prevent content hiding behind sticky bar
+- Verified transaction API works: POST /api/transactions creates order successfully
+- Verified admin dashboard shows transactions via /api/admin/transactions
+- All changes pass lint check
+
+Stage Summary:
+- Order button now works correctly with isolated loading state
+- All 692 nominals start from Rp1.000 (was missing for most games before)
+- Mobile responsive: sticky bottom bar for quick ordering
+- Transactions flow: user submits → stored in DB → visible in admin dashboard

@@ -389,8 +389,9 @@ function TopUpForm() {
     selectedGame, selectedNominal, setSelectedNominal,
     playerName, setPlayerName, playerId, setPlayerId,
     playerServer, setPlayerServer, playerWhatsapp, setPlayerWhatsapp,
-    setCurrentView, resetForm, settings, loading, setLoading
+    setCurrentView, resetForm, settings
   } = useStore()
+  const [submitLoading, setSubmitLoading] = useState(false)
   const [copiedDana, setCopiedDana] = useState(false)
   const [orderSuccess, setOrderSuccess] = useState(false)
   const [detailImgError, setDetailImgError] = useState(false)
@@ -402,7 +403,7 @@ function TopUpForm() {
     if (!playerName.trim() || !playerId.trim()) { toast.error('Nama dan ID pemain wajib diisi!'); return }
     if (!selectedNominal) { toast.error('Pilih nominal terlebih dahulu!'); return }
 
-    setLoading(true)
+    setSubmitLoading(true)
     try {
       const res = await fetch('/api/transactions', {
         method: 'POST',
@@ -424,7 +425,7 @@ function TopUpForm() {
       }
     } catch {
       toast.error('Terjadi kesalahan. Coba lagi nanti.')
-    } finally { setLoading(false) }
+    } finally { setSubmitLoading(false) }
   }
 
   const copyDana = () => {
@@ -655,8 +656,8 @@ function TopUpForm() {
               </div>
 
               <div className="space-y-2 pt-2">
-                <Button onClick={handleSubmit} disabled={loading || !selectedNominal} className="w-full h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 disabled:opacity-50">
-                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Send className="w-4 h-4 mr-2" /> Buat Pesanan</>}
+                <Button onClick={handleSubmit} disabled={submitLoading || !selectedNominal} className="w-full h-12 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 disabled:opacity-50">
+                  {submitLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Send className="w-4 h-4 mr-2" /> Buat Pesanan</>}
                 </Button>
                 <a href={`https://wa.me/${settings.whatsapp || '6285169300773'}?text=${encodeURIComponent('Halo admin, saya ingin bertanya tentang top up.')}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 w-full h-11 rounded-xl border border-green-500 text-green-600 hover:bg-green-50 transition-colors text-sm font-medium">
                   <Phone className="w-4 h-4" /> Chat Admin WhatsApp
@@ -664,6 +665,29 @@ function TopUpForm() {
               </div>
             </CardContent>
           </Card>
+        </div>
+      </div>
+
+      {/* Mobile sticky bottom bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] px-4 py-3 safe-area-inset-bottom">
+        <div className="flex items-center gap-3">
+          {selectedNominal ? (
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-slate-400 truncate">{selectedNominal.name}</p>
+              <p className="text-base font-bold text-blue-600">{formatRupiah(selectedNominal.price)}</p>
+            </div>
+          ) : (
+            <div className="flex-1">
+              <p className="text-sm text-slate-400">Pilih nominal terlebih dahulu</p>
+            </div>
+          )}
+          <Button
+            onClick={handleSubmit}
+            disabled={submitLoading || !selectedNominal}
+            className="h-11 px-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/25 disabled:opacity-50 shrink-0"
+          >
+            {submitLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Send className="w-4 h-4 mr-1.5" /> Pesan</>}
+          </Button>
         </div>
       </div>
     </motion.div>
@@ -1408,7 +1432,7 @@ export default function HomePage() {
           )}
 
           {currentView === 'game' && (
-            <motion.div key="game" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-12">
+            <motion.div key="game" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-24 lg:pb-12">
               <TopUpForm />
             </motion.div>
           )}
