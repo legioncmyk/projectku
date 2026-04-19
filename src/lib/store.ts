@@ -40,6 +40,7 @@ export interface Transaction {
   nominalName: string
   price: number
   status: string
+  notes: string
   whatsapp: string
   createdAt: string
   updatedAt: string
@@ -50,6 +51,8 @@ export interface StoreSettings {
   rekening: string
   bankName: string
   bankHolder: string
+  qrisStatus: string
+  siteName: string
   [key: string]: string
 }
 
@@ -114,7 +117,7 @@ const initialState = {
   games: [] as Game[],
   filteredGames: [] as Game[],
   sliders: [] as Slider[],
-  settings: { whatsapp: '', rekening: '', bankName: '', bankHolder: '' } as StoreSettings,
+  settings: { whatsapp: '', rekening: '', bankName: '', bankHolder: '', qrisStatus: '', siteName: '' } as StoreSettings,
   transactions: [] as Transaction[],
   onlineCount: 0,
   selectedGame: null,

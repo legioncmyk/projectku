@@ -52,6 +52,7 @@ model Transaction {
   nominalName String
   price       Float
   status      String   @default("pending")
+  notes       String   @default("")
   whatsapp    String   @default("")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

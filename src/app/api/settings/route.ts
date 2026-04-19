@@ -23,13 +23,14 @@ export async function GET() {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    const { whatsapp, rekening, bankName, bankHolder } = body
-
+    // Accept any key-value pairs
     const updates: Record<string, string> = {}
-    if (whatsapp !== undefined) updates.whatsapp = String(whatsapp)
-    if (rekening !== undefined) updates.rekening = String(rekening)
-    if (bankName !== undefined) updates.bankName = String(bankName)
-    if (bankHolder !== undefined) updates.bankHolder = String(bankHolder)
+    
+    for (const [key, value] of Object.entries(body)) {
+      if (typeof value === 'string') {
+        updates[key] = value
+      }
+    }
 
     if (Object.keys(updates).length === 0) {
       return NextResponse.json(

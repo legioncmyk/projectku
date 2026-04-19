@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 
-const VALID_STATUSES = ['pending', 'processing', 'success', 'failed']
+const VALID_STATUSES = ['pending', 'processing', 'success', 'rejected']
 
 export async function PATCH(
   request: NextRequest,
@@ -10,10 +10,10 @@ export async function PATCH(
   try {
     const { id } = await params
     const body = await request.json()
-    const { status } = body
+    const { status, notes } = body
 
-    // Validate status
-    if (!status || !VALID_STATUSES.includes(status)) {
+    // Validate status if provided
+    if (status && !VALID_STATUSES.includes(status)) {
       return NextResponse.json(
         {
           success: false,
@@ -37,7 +37,10 @@ export async function PATCH(
 
     const transaction = await db.transaction.update({
       where: { id },
-      data: { status },
+      data: {
+        ...(status && { status }),
+        ...(notes !== undefined && { notes }),
+      },
     })
 
     return NextResponse.json({ success: true, data: transaction })
