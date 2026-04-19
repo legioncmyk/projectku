@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Game {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  image     String    @default("")
+  category  String    @default("Action")
+  popular   Boolean   @default(false)
+  nominals  Nominal[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Nominal {
+  id            String  @id @default(cuid())
+  gameId        String
+  game          Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  name          String
+  price         Float
+  originalPrice Float?
+  createdAt     DateTime @default(now())
+}
+
+model Slider {
+  id        String   @id @default(cuid())
+  image     String   @default("")
+  title     String
+  subtitle  String   @default("")
+  gameId    String?
+  gameSlug  String?
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  playerName  String
+  playerId    String
+  server      String   @default("")
+  gameId      String
+  gameName    String
+  nominalId   String
+  nominalName String
+  price       Float
+  status      String   @default("pending")
+  whatsapp    String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Settings {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
+
+model OnlineUser {
+  id        String   @id @default(cuid())
+  sessionId String   @unique
+  lastSeen  DateTime @default(now())
+}
+
+model LoginAttempt {
+  id          String    @id @default(cuid())
+  ip          String    @unique
+  attempts    Int       @default(1)
+  lastAttempt DateTime  @default(now())
+  lockedUntil DateTime?
+}
