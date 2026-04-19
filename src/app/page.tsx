@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useStore, type Game, type Nominal, type Transaction } from '@/lib/store'
+import { useStore, type Game, type Nominal, type Transaction, type Slider } from '@/lib/store'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -14,8 +15,8 @@ import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
 import {
   Search, Gamepad2, ChevronLeft, ChevronRight, User, Hash,
-  Wifi, Shield, TrendingUp, Package, ShoppingBag, Users,
-  Settings, Image, CreditCard, BarChart3, LogOut, Copy,
+  Shield, TrendingUp, Package, ShoppingBag, Users,
+  Settings, Image as ImageIcon, CreditCard, BarChart3, LogOut, Copy,
   Check, Trash2, Edit3, Plus, Eye, EyeOff, Send, ArrowLeft,
   RefreshCw, Clock, CheckCircle, XCircle, AlertCircle, Loader2,
   Menu, X, Zap, Star, ChevronDown, Phone, Building, Filter, Lock
@@ -77,7 +78,37 @@ function getStatusIcon(status: string) {
   }
 }
 
+function isImageUrl(str: string): boolean {
+  return str.startsWith('/games/') || str.startsWith('http://') || str.startsWith('https://') || str.startsWith('/')
+}
+
+const CATEGORIES = ['MOBA', 'Battle Royale', 'RPG', 'Strategy', 'MMORPG', 'Action', 'Sports', 'Card', 'Other']
+
 const SESSION_ID = typeof crypto !== 'undefined' ? crypto.randomUUID() : Math.random().toString(36).slice(2)
+
+// ─── Ad Banner Component ───────────────────────────────────
+function AdBanner() {
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    const existing = document.querySelector('script[data-ad-invoke]')
+    if (existing) return
+    const script = document.createElement('script')
+    script.src = 'https://pl29190180.profitablecpmratenetwork.com/f686f2e4d813d429defe29b06f6684bc/invoke.js'
+    script.async = true
+    script.setAttribute('data-cfasync', 'false')
+    script.setAttribute('data-ad-invoke', 'true')
+    document.body.appendChild(script)
+    return () => {
+      script.remove()
+    }
+  }, [])
+
+  return (
+    <div className="w-full max-w-6xl mx-auto my-4 px-4">
+      <div id="container-f686f2e4d813d429defe29b06f6684bc" />
+    </div>
+  )
+}
 
 // ─── Header Component ──────────────────────────────────────
 function Header() {
@@ -182,7 +213,7 @@ function HeroSlider() {
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
   }, [next, sliders.length])
 
-  const handleSliderClick = (slider: typeof sliders[0]) => {
+  const handleSliderClick = (slider: Slider) => {
     if (slider.gameSlug) {
       const game = games.find(g => g.slug === slider.gameSlug)
       if (game) {
@@ -202,6 +233,9 @@ function HeroSlider() {
     'from-orange-600 via-orange-700 to-red-800',
   ]
 
+  const activeSlider = sliders[current]
+  const hasBannerImage = activeSlider?.image && (activeSlider.image.startsWith('/') || activeSlider.image.startsWith('http'))
+
   return (
     <section className="relative w-full overflow-hidden rounded-2xl mt-4 mx-auto max-w-6xl">
       <div className="relative h-48 sm:h-64 md:h-80">
@@ -212,10 +246,27 @@ function HeroSlider() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
             transition={{ duration: 0.4 }}
-            className={`absolute inset-0 bg-gradient-to-br ${sliderGradients[current % sliderGradients.length]} cursor-pointer`}
+            className="absolute inset-0 cursor-pointer"
             onClick={() => handleSliderClick(sliders[current])}
           >
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.15),_transparent_60%)]" />
+            {/* Banner image or gradient fallback */}
+            {hasBannerImage ? (
+              <>
+                <Image
+                  src={activeSlider.image}
+                  alt={activeSlider.title}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+              </>
+            ) : (
+              <div className={`absolute inset-0 bg-gradient-to-br ${sliderGradients[current % sliderGradients.length]}`}>
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.15),_transparent_60%)]" />
+              </div>
+            )}
+
             <div className="relative h-full flex items-center px-6 sm:px-10 md:px-16">
               <div className="max-w-lg">
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
@@ -223,11 +274,11 @@ function HeroSlider() {
                     <Star className="w-3 h-3 mr-1" /> PROMO
                   </Badge>
                 </motion.div>
-                <motion.h2 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 leading-tight">
-                  {sliders[current]?.title}
+                <motion.h2 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 leading-tight drop-shadow-lg">
+                  {activeSlider?.title}
                 </motion.h2>
-                <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="text-sm sm:text-base text-white/80 mb-4">
-                  {sliders[current]?.subtitle}
+                <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="text-sm sm:text-base text-white/90 mb-4 drop-shadow-md">
+                  {activeSlider?.subtitle}
                 </motion.p>
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
                   <span className="inline-flex items-center gap-2 bg-white text-slate-900 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-white/90 transition-colors">
@@ -235,10 +286,12 @@ function HeroSlider() {
                   </span>
                 </motion.div>
               </div>
-              {/* Decorative elements */}
-              <div className="absolute right-4 sm:right-10 md:right-16 top-1/2 -translate-y-1/2 opacity-10">
-                <Gamepad2 className="w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 text-white" />
-              </div>
+              {/* Decorative elements - only show when no banner image */}
+              {!hasBannerImage && (
+                <div className="absolute right-4 sm:right-10 md:right-16 top-1/2 -translate-y-1/2 opacity-10">
+                  <Gamepad2 className="w-32 h-32 sm:w-48 sm:h-48 md:w-64 md:h-64 text-white" />
+                </div>
+              )}
             </div>
           </motion.div>
         </AnimatePresence>
@@ -280,6 +333,7 @@ function GameCard({ game, index }: { game: Game; index: number }) {
 
   const minPrice = game.nominals.length > 0 ? Math.min(...game.nominals.map(n => n.price)) : 0
   const hasDiscount = game.nominals.some(n => n.originalPrice && n.originalPrice > n.price)
+  const hasImage = game.image && isImageUrl(game.image)
 
   return (
     <motion.div
@@ -294,15 +348,25 @@ function GameCard({ game, index }: { game: Game; index: number }) {
         <CardContent className="p-0">
           {/* Game Image/Icon */}
           <div className={`relative h-28 sm:h-32 bg-gradient-to-br ${getCategoryColor(game.category)} flex items-center justify-center overflow-hidden`}>
-            <span className="text-4xl sm:text-5xl filter drop-shadow-lg">{game.image || getCategoryEmoji(game.category)}</span>
+            {hasImage ? (
+              <Image
+                src={game.image}
+                alt={game.name}
+                fill
+                className="object-cover"
+                unoptimized
+              />
+            ) : (
+              <span className="text-4xl sm:text-5xl filter drop-shadow-lg">{game.image || getCategoryEmoji(game.category)}</span>
+            )}
             {/* Popular badge */}
             {game.popular && (
-              <Badge className="absolute top-2 right-2 bg-yellow-500 text-black text-[10px] font-bold px-2 py-0.5">
+              <Badge className="absolute top-2 right-2 bg-yellow-500 text-black text-[10px] font-bold px-2 py-0.5 z-10">
                 <Star className="w-2.5 h-2.5 mr-0.5" /> POPULER
               </Badge>
             )}
             {/* Hover overlay */}
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 z-10">
               <span className="bg-white text-slate-900 px-4 py-2 rounded-lg text-sm font-semibold transform scale-90 group-hover:scale-100 transition-transform shadow-lg">
                 Top Up
               </span>
@@ -336,7 +400,6 @@ function GameCard({ game, index }: { game: Game; index: number }) {
 // ─── Game Grid (Home View) ────────────────────────────────
 function GameGrid() {
   const { filteredGames, searchQuery, selectedCategory, games, setFilteredGames, setSearchQuery, setSelectedCategory } = useStore()
-  const [showFilters, setShowFilters] = useState(false)
 
   const categories = ['Semua', ...Array.from(new Set(games.map(g => g.category)))]
 
@@ -377,7 +440,7 @@ function GameGrid() {
       {/* Category Filters */}
       <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
         <button
-          onClick={() => setShowFilters(!showFilters)}
+          onClick={() => setSelectedCategory(selectedCategory === 'Semua' ? 'Action' : 'Semua')}
           className="flex items-center gap-1 px-3 py-2 rounded-lg bg-slate-100 text-slate-600 text-sm font-medium hover:bg-slate-200 transition-colors shrink-0 sm:hidden"
         >
           <Filter className="w-4 h-4" /> Filter
@@ -507,6 +570,8 @@ function TopUpForm() {
     setTimeout(() => setCopiedRek(false), 2000)
   }
 
+  const gameHasImage = selectedGame.image && isImageUrl(selectedGame.image)
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -525,13 +590,26 @@ function TopUpForm() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Left: Form */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Game Header */}
+          {/* Game Header with image support */}
           <div className={`rounded-xl bg-gradient-to-r ${getCategoryColor(selectedGame.category)} p-6 text-white relative overflow-hidden`}>
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(255,255,255,0.1),_transparent_50%)]" />
             <div className="relative flex items-center gap-4">
-              <div className="w-16 h-16 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-3xl">
-                {selectedGame.image || getCategoryEmoji(selectedGame.category)}
-              </div>
+              {gameHasImage ? (
+                <div className="w-16 h-16 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden shrink-0">
+                  <Image
+                    src={selectedGame.image}
+                    alt={selectedGame.name}
+                    width={64}
+                    height={64}
+                    className="object-cover rounded-xl"
+                    unoptimized
+                  />
+                </div>
+              ) : (
+                <div className="w-16 h-16 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-3xl shrink-0">
+                  {selectedGame.image || getCategoryEmoji(selectedGame.category)}
+                </div>
+              )}
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold">{selectedGame.name}</h1>
                 <Badge className="bg-white/20 text-white border-white/30 mt-1">{selectedGame.category}</Badge>
@@ -918,15 +996,42 @@ function AdminLogin() {
 // ─── Admin Dashboard ───────────────────────────────────────
 function AdminDashboard() {
   const {
-    adminTab, setAdminTab, games, transactions, settings,
+    adminTab, setAdminTab, games, transactions, settings, sliders, setSliders,
     setIsAdmin, setCurrentView, setGames, setTransactions, setSettings
   } = useStore()
+
   const [stats, setStats] = useState({ totalGames: 0, totalTransactions: 0, pendingTransactions: 0, completedTransactions: 0, totalRevenue: 0, onlineUsers: 0 })
   const [txPage, setTxPage] = useState(1)
   const [txStatus, setTxStatus] = useState('')
-  const [editGame, setEditGame] = useState<Game | null>(null)
-  const [editSlider, setEditSlider] = useState<{id: string, title: string, subtitle: string, order: number, active: boolean} | null>(null)
+  const [saving, setSaving] = useState(false)
 
+  // Product dialog state
+  const [productDialogOpen, setProductDialogOpen] = useState(false)
+  const [editingGame, setEditingGame] = useState<Game | null>(null)
+  const [productForm, setProductForm] = useState({
+    name: '', slug: '', image: '', category: 'MOBA', popular: false,
+    nominals: [{ name: '', price: 0, originalPrice: 0 }]
+  })
+
+  // Slider dialog state
+  const [sliderDialogOpen, setSliderDialogOpen] = useState(false)
+  const [editingSlider, setEditingSlider] = useState<Slider | null>(null)
+  const [sliderForm, setSliderForm] = useState({
+    image: '', title: '', subtitle: '', gameSlug: '', order: 0, active: true
+  })
+
+  // Delete confirmation dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<{ type: 'game' | 'slider'; id: string; name: string } | null>(null)
+
+  // Settings form state
+  const [settingsForm, setSettingsForm] = useState(settings)
+
+  useEffect(() => {
+    setSettingsForm(settings)
+  }, [settings])
+
+  // ─── Data Loaders ────────────────────────────────────────
   const loadStats = useCallback(async () => {
     try {
       const res = await fetch('/api/admin/stats')
@@ -953,6 +1058,14 @@ function AdminDashboard() {
     } catch { /* silent */ }
   }, [setGames])
 
+  const loadSliders = useCallback(async () => {
+    try {
+      const res = await fetch('/api/slider')
+      const data = await res.json()
+      if (data.success) setSliders(data.data)
+    } catch { /* silent */ }
+  }, [setSliders])
+
   const loadSettings = useCallback(async () => {
     try {
       const res = await fetch('/api/settings')
@@ -965,9 +1078,17 @@ function AdminDashboard() {
     loadStats()
     loadTransactions()
     loadGames()
+    loadSliders()
     loadSettings()
-  }, [loadStats, loadTransactions, loadGames, loadSettings])
+  }, [loadStats, loadTransactions, loadGames, loadSliders, loadSettings])
 
+  const refreshAll = useCallback(() => {
+    loadStats()
+    loadGames()
+    loadSliders()
+  }, [loadStats, loadGames, loadSliders])
+
+  // ─── Handlers ────────────────────────────────────────────
   const handleLogout = () => {
     setIsAdmin(false)
     setCurrentView('admin')
@@ -1010,38 +1131,256 @@ function AdminDashboard() {
     }
   }
 
-  const handleDeleteGame = async (id: string) => {
+  // ─── Product CRUD ────────────────────────────────────────
+  const openAddProduct = () => {
+    setEditingGame(null)
+    setProductForm({
+      name: '', slug: '', image: '', category: 'MOBA', popular: false,
+      nominals: [{ name: '', price: 0, originalPrice: 0 }]
+    })
+    setProductDialogOpen(true)
+  }
+
+  const openEditProduct = (game: Game) => {
+    setEditingGame(game)
+    setProductForm({
+      name: game.name,
+      slug: game.slug,
+      image: game.image,
+      category: game.category,
+      popular: game.popular,
+      nominals: game.nominals.length > 0
+        ? game.nominals.map(n => ({ name: n.name, price: n.price, originalPrice: n.originalPrice || 0 }))
+        : [{ name: '', price: 0, originalPrice: 0 }]
+    })
+    setProductDialogOpen(true)
+  }
+
+  const handleSaveProduct = async () => {
+    if (!productForm.name.trim() || !productForm.slug.trim()) {
+      toast.error('Nama dan slug wajib diisi!')
+      return
+    }
+    const validNominals = productForm.nominals.filter(n => n.name.trim() && n.price > 0)
+    if (!editingGame && validNominals.length === 0) {
+      toast.error('Tambahkan minimal satu nominal!')
+      return
+    }
+
+    setSaving(true)
     try {
-      const res = await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' })
+      if (editingGame) {
+        const res = await fetch('/api/admin/products', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: editingGame.id,
+            name: productForm.name.trim(),
+            slug: productForm.slug.trim(),
+            image: productForm.image.trim(),
+            category: productForm.category,
+            popular: productForm.popular,
+          }),
+        })
+        const data = await res.json()
+        if (data.success) {
+          toast.success('Produk berhasil diupdate!')
+          setProductDialogOpen(false)
+          refreshAll()
+        } else {
+          toast.error(data.message || 'Gagal update produk')
+        }
+      } else {
+        const res = await fetch('/api/admin/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: productForm.name.trim(),
+            slug: productForm.slug.trim(),
+            image: productForm.image.trim(),
+            category: productForm.category,
+            popular: productForm.popular,
+            nominals: validNominals.map(n => ({
+              name: n.name.trim(),
+              price: Number(n.price),
+              originalPrice: n.originalPrice > 0 ? Number(n.originalPrice) : null,
+            })),
+          }),
+        })
+        const data = await res.json()
+        if (data.success) {
+          toast.success('Produk berhasil ditambahkan!')
+          setProductDialogOpen(false)
+          refreshAll()
+        } else {
+          toast.error(data.message || 'Gagal menambahkan produk')
+        }
+      }
+    } catch {
+      toast.error('Terjadi kesalahan')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const confirmDeleteGame = (game: Game) => {
+    setDeleteTarget({ type: 'game', id: game.id, name: game.name })
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDeleteGame = async () => {
+    if (!deleteTarget) return
+    try {
+      const res = await fetch(`/api/admin/products?id=${deleteTarget.id}`, { method: 'DELETE' })
       const data = await res.json()
       if (data.success) {
         toast.success('Game berhasil dihapus')
-        loadGames()
-        loadStats()
+        refreshAll()
+      } else {
+        toast.error(data.message || 'Gagal menghapus game')
       }
     } catch {
       toast.error('Gagal menghapus game')
+    } finally {
+      setDeleteDialogOpen(false)
+      setDeleteTarget(null)
     }
   }
 
-  const handleDeleteSlider = async (id: string) => {
+  // ─── Slider CRUD ─────────────────────────────────────────
+  const openAddSlider = () => {
+    setEditingSlider(null)
+    setSliderForm({
+      image: '', title: '', subtitle: '', gameSlug: '', order: 0, active: true
+    })
+    setSliderDialogOpen(true)
+  }
+
+  const openEditSlider = (slider: Slider) => {
+    setEditingSlider(slider)
+    setSliderForm({
+      image: slider.image,
+      title: slider.title,
+      subtitle: slider.subtitle,
+      gameSlug: slider.gameSlug || '',
+      order: slider.order,
+      active: slider.active,
+    })
+    setSliderDialogOpen(true)
+  }
+
+  const handleSaveSlider = async () => {
+    if (!sliderForm.title.trim()) {
+      toast.error('Title wajib diisi!')
+      return
+    }
+
+    setSaving(true)
     try {
-      const res = await fetch(`/api/admin/slider?id=${id}`, { method: 'DELETE' })
+      if (editingSlider) {
+        const res = await fetch('/api/admin/slider', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: editingSlider.id,
+            image: sliderForm.image.trim(),
+            title: sliderForm.title.trim(),
+            subtitle: sliderForm.subtitle.trim(),
+            gameSlug: sliderForm.gameSlug.trim() || null,
+            order: Number(sliderForm.order),
+            active: sliderForm.active,
+          }),
+        })
+        const data = await res.json()
+        if (data.success) {
+          toast.success('Slider berhasil diupdate!')
+          setSliderDialogOpen(false)
+          loadSliders()
+        } else {
+          toast.error(data.message || 'Gagal update slider')
+        }
+      } else {
+        const res = await fetch('/api/admin/slider', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image: sliderForm.image.trim(),
+            title: sliderForm.title.trim(),
+            subtitle: sliderForm.subtitle.trim(),
+            gameSlug: sliderForm.gameSlug.trim() || null,
+            order: Number(sliderForm.order),
+          }),
+        })
+        const data = await res.json()
+        if (data.success) {
+          toast.success('Slider berhasil ditambahkan!')
+          setSliderDialogOpen(false)
+          loadSliders()
+        } else {
+          toast.error(data.message || 'Gagal menambahkan slider')
+        }
+      }
+    } catch {
+      toast.error('Terjadi kesalahan')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const confirmDeleteSlider = (slider: Slider) => {
+    setDeleteTarget({ type: 'slider', id: slider.id, name: slider.title })
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDeleteSlider = async () => {
+    if (!deleteTarget) return
+    try {
+      const res = await fetch(`/api/admin/slider?id=${deleteTarget.id}`, { method: 'DELETE' })
       const data = await res.json()
       if (data.success) {
         toast.success('Slider berhasil dihapus')
+        loadSliders()
+      } else {
+        toast.error(data.message || 'Gagal menghapus slider')
       }
     } catch {
       toast.error('Gagal menghapus slider')
+    } finally {
+      setDeleteDialogOpen(false)
+      setDeleteTarget(null)
     }
   }
 
-  // Settings form state
-  const [settingsForm, setSettingsForm] = useState(settings)
+  const handleDeleteConfirm = () => {
+    if (!deleteTarget) return
+    if (deleteTarget.type === 'game') {
+      handleDeleteGame()
+    } else {
+      handleDeleteSlider()
+    }
+  }
 
-  useEffect(() => {
-    setSettingsForm(settings)
-  }, [settings])
+  // ─── Nominal Row Helpers ─────────────────────────────────
+  const addNominalRow = () => {
+    setProductForm(prev => ({
+      ...prev,
+      nominals: [...prev.nominals, { name: '', price: 0, originalPrice: 0 }]
+    }))
+  }
+
+  const removeNominalRow = (index: number) => {
+    setProductForm(prev => ({
+      ...prev,
+      nominals: prev.nominals.filter((_, i) => i !== index)
+    }))
+  }
+
+  const updateNominalRow = (index: number, field: 'name' | 'price' | 'originalPrice', value: string | number) => {
+    setProductForm(prev => ({
+      ...prev,
+      nominals: prev.nominals.map((n, i) => i === index ? { ...n, [field]: value } : n)
+    }))
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -1052,9 +1391,20 @@ function AdminDashboard() {
             <Shield className="w-5 h-5 text-blue-400" />
             <span className="font-bold">Admin Dashboard</span>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleLogout} className="text-slate-400 hover:text-white">
-            <LogOut className="w-4 h-4 mr-2" /> Logout
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={refreshAll}
+              className="text-slate-400 hover:text-white"
+              title="Refresh data"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={handleLogout} className="text-slate-400 hover:text-white">
+              <LogOut className="w-4 h-4 mr-2" /> Logout
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -1067,7 +1417,7 @@ function AdminDashboard() {
                 { key: 'overview' as const, icon: BarChart3, label: 'Overview' },
                 { key: 'products' as const, icon: Package, label: 'Produk' },
                 { key: 'transactions' as const, icon: ShoppingBag, label: 'Transaksi' },
-                { key: 'sliders' as const, icon: Image, label: 'Slider' },
+                { key: 'sliders' as const, icon: ImageIcon, label: 'Slider' },
                 { key: 'settings' as const, icon: Settings, label: 'Pengaturan' },
               ].map(item => (
                 <button
@@ -1123,34 +1473,57 @@ function AdminDashboard() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-bold">Produk ({games.length})</h2>
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                    <Plus className="w-4 h-4 mr-1" /> Tambah
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={openAddProduct}>
+                    <Plus className="w-4 h-4 mr-1" /> Tambah Produk
                   </Button>
                 </div>
                 <div className="space-y-2 max-h-[70vh] overflow-y-auto">
-                  {games.map(game => (
-                    <Card key={game.id} className="bg-slate-900 border-slate-800">
-                      <CardContent className="p-4 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${getCategoryColor(game.category)} flex items-center justify-center text-lg`}>
-                            {game.image || getCategoryEmoji(game.category)}
+                  {games.map(game => {
+                    const gameHasImg = game.image && isImageUrl(game.image)
+                    return (
+                      <Card key={game.id} className="bg-slate-900 border-slate-800">
+                        <CardContent className="p-4 flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            {gameHasImg ? (
+                              <div className="w-12 h-12 rounded-lg overflow-hidden shrink-0 relative">
+                                <Image
+                                  src={game.image}
+                                  alt={game.name}
+                                  fill
+                                  className="object-cover"
+                                  unoptimized
+                                />
+                              </div>
+                            ) : (
+                              <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${getCategoryColor(game.category)} flex items-center justify-center text-xl shrink-0`}>
+                                {game.image || getCategoryEmoji(game.category)}
+                              </div>
+                            )}
+                            <div>
+                              <p className="font-medium text-sm">{game.name}</p>
+                              <p className="text-xs text-slate-400">{game.nominals.length} nominal · {game.category}</p>
+                              {game.popular && (
+                                <Badge className="mt-1 text-[9px] bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+                                  <Star className="w-2.5 h-2.5 mr-0.5" /> Populer
+                                </Badge>
+                              )}
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-medium text-sm">{game.name}</p>
-                            <p className="text-xs text-slate-400">{game.nominals.length} nominal · {game.category}</p>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="sm" onClick={() => openEditProduct(game)} className="text-slate-400 hover:text-white h-8 w-8 p-0">
+                              <Edit3 className="w-4 h-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => confirmDeleteGame(game)} className="text-slate-400 hover:text-red-400 h-8 w-8 p-0">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
-                        </div>
-                        <div className="flex gap-1">
-                          <Button variant="ghost" size="sm" onClick={() => setEditGame(game)} className="text-slate-400 hover:text-white h-8 w-8 p-0">
-                            <Edit3 className="w-4 h-4" />
-                          </Button>
-                          <Button variant="ghost" size="sm" onClick={() => handleDeleteGame(game.id)} className="text-slate-400 hover:text-red-400 h-8 w-8 p-0">
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
+                  {games.length === 0 && (
+                    <p className="text-center text-slate-500 py-12">Belum ada produk</p>
+                  )}
                 </div>
               </div>
             )}
@@ -1223,26 +1596,55 @@ function AdminDashboard() {
             {/* Sliders */}
             {adminTab === 'sliders' && (
               <div className="space-y-4">
-                <h2 className="text-lg font-bold">Slider</h2>
-                <div className="space-y-2">
-                  {[
-                    { title: 'MLBB Diamond Sale!', subtitle: 'Diskon hingga 30%', slug: 'mobile-legends-bang-bang' },
-                    { title: 'Free Fire Top Up Murah', subtitle: 'Termurah se-Indonesia', slug: 'free-fire' },
-                    { title: 'Genshin Impact Promo', subtitle: 'Genesis Crystals spesial', slug: 'genshin-impact' },
-                    { title: 'PUBG Mobile UC', subtitle: 'Proses instan', slug: 'pubg-mobile' },
-                  ].map((slider, i) => (
-                    <Card key={i} className="bg-slate-900 border-slate-800">
-                      <CardContent className="p-4 flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-sm">{slider.title}</p>
-                          <p className="text-xs text-slate-400">{slider.subtitle} · Game: {slider.slug}</p>
-                        </div>
-                        <Button variant="ghost" size="sm" className="text-slate-400 hover:text-red-400 h-8 w-8 p-0">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-bold">Slider ({sliders.length})</h2>
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={openAddSlider}>
+                    <Plus className="w-4 h-4 mr-1" /> Tambah Slider
+                  </Button>
+                </div>
+                <div className="space-y-2 max-h-[70vh] overflow-y-auto">
+                  {sliders.map(slider => {
+                    const sliderHasImg = slider.image && (slider.image.startsWith('/') || slider.image.startsWith('http'))
+                    return (
+                      <Card key={slider.id} className="bg-slate-900 border-slate-800">
+                        <CardContent className="p-4 flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            {sliderHasImg ? (
+                              <div className="w-16 h-10 rounded-lg overflow-hidden shrink-0 relative">
+                                <Image
+                                  src={slider.image}
+                                  alt={slider.title}
+                                  fill
+                                  className="object-cover"
+                                  unoptimized
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-16 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-800 flex items-center justify-center shrink-0">
+                                <ImageIcon className="w-4 h-4 text-white/50" />
+                              </div>
+                            )}
+                            <div>
+                              <p className="font-medium text-sm">{slider.title}</p>
+                              <p className="text-xs text-slate-400">{slider.subtitle}</p>
+                              <p className="text-[10px] text-slate-500 mt-0.5">Order: {slider.order} · {slider.active ? 'Aktif' : 'Nonaktif'} · {slider.gameSlug || 'Tanpa link'}</p>
+                            </div>
+                          </div>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="sm" onClick={() => openEditSlider(slider)} className="text-slate-400 hover:text-white h-8 w-8 p-0">
+                              <Edit3 className="w-4 h-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => confirmDeleteSlider(slider)} className="text-slate-400 hover:text-red-400 h-8 w-8 p-0">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
+                  {sliders.length === 0 && (
+                    <p className="text-center text-slate-500 py-12">Belum ada slider</p>
+                  )}
                 </div>
               </div>
             )}
@@ -1299,6 +1701,236 @@ function AdminDashboard() {
           </main>
         </div>
       </div>
+
+      {/* ─── Product Dialog ─────────────────────────────── */}
+      <Dialog open={productDialogOpen} onOpenChange={setProductDialogOpen}>
+        <DialogContent className="bg-white text-slate-900 max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingGame ? 'Edit Produk' : 'Tambah Produk Baru'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">Nama Game *</label>
+                <Input
+                  value={productForm.name}
+                  onChange={(e) => setProductForm({ ...productForm, name: e.target.value.slice(0, 100) })}
+                  placeholder="Mobile Legends"
+                  className="h-10"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">Slug *</label>
+                <Input
+                  value={productForm.slug}
+                  onChange={(e) => setProductForm({ ...productForm, slug: e.target.value.replace(/[^a-z0-9-]/gi, '-').slice(0, 100) })}
+                  placeholder="mobile-legends-bang-bang"
+                  className="h-10"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">URL Gambar</label>
+              <Input
+                value={productForm.image}
+                onChange={(e) => setProductForm({ ...productForm, image: e.target.value.slice(0, 500) })}
+                placeholder="/games/mlbb.png atau https://example.com/image.jpg"
+                className="h-10"
+              />
+              {productForm.image && isImageUrl(productForm.image) && (
+                <div className="w-16 h-16 rounded-lg overflow-hidden relative mt-2 border border-slate-200">
+                  <Image src={productForm.image} alt="Preview" fill className="object-cover" unoptimized />
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">Kategori</label>
+                <div className="relative">
+                  <select
+                    value={productForm.category}
+                    onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                    className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 text-sm focus:border-blue-500 focus:ring-blue-500/20 focus:outline-none"
+                  >
+                    {CATEGORIES.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="space-y-2 flex items-end pb-1">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={productForm.popular}
+                    onChange={(e) => setProductForm({ ...productForm, popular: e.target.checked })}
+                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  <span className="text-sm font-medium text-slate-700">
+                    <Star className="w-3.5 h-3.5 inline mr-1 text-yellow-500" />Tandai sebagai Populer
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            {/* Nominals */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-slate-700">Nominal Produk</label>
+                {!editingGame && (
+                  <Button type="button" variant="outline" size="sm" onClick={addNominalRow} className="h-8 text-xs">
+                    <Plus className="w-3 h-3 mr-1" /> Tambah Nominal
+                  </Button>
+                )}
+              </div>
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {productForm.nominals.map((nom, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <Input
+                      value={nom.name}
+                      onChange={(e) => updateNominalRow(i, 'name', e.target.value.slice(0, 100))}
+                      placeholder="Nama (86 Diamond)"
+                      className="h-9 flex-1"
+                    />
+                    <Input
+                      type="number"
+                      value={nom.price || ''}
+                      onChange={(e) => updateNominalRow(i, 'price', Number(e.target.value) || 0)}
+                      placeholder="Harga"
+                      className="h-24 w-28"
+                    />
+                    <Input
+                      type="number"
+                      value={nom.originalPrice || ''}
+                      onChange={(e) => updateNominalRow(i, 'originalPrice', Number(e.target.value) || 0)}
+                      placeholder="Harga asli"
+                      className="h-9 w-28"
+                    />
+                    {!editingGame && productForm.nominals.length > 1 && (
+                      <Button type="button" variant="ghost" size="sm" onClick={() => removeNominalRow(i)} className="h-9 w-9 p-0 text-red-400 hover:text-red-600 hover:bg-red-50">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {!editingGame && (
+                <Button type="button" variant="ghost" size="sm" onClick={addNominalRow} className="w-full h-8 text-xs text-slate-500 hover:text-blue-600">
+                  <Plus className="w-3 h-3 mr-1" /> Tambah Nominal
+                </Button>
+              )}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setProductDialogOpen(false)} className="h-10">Batal</Button>
+            <Button onClick={handleSaveProduct} disabled={saving} className="bg-blue-600 hover:bg-blue-700 h-10">
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : editingGame ? 'Update Produk' : 'Tambah Produk'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ─── Slider Dialog ─────────────────────────────── */}
+      <Dialog open={sliderDialogOpen} onOpenChange={setSliderDialogOpen}>
+        <DialogContent className="bg-white text-slate-900 max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{editingSlider ? 'Edit Slider' : 'Tambah Slider Baru'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">URL Gambar Banner</label>
+              <Input
+                value={sliderForm.image}
+                onChange={(e) => setSliderForm({ ...sliderForm, image: e.target.value.slice(0, 500) })}
+                placeholder="/banners/promo.jpg atau https://..."
+                className="h-10"
+              />
+              {sliderForm.image && isImageUrl(sliderForm.image) && (
+                <div className="w-full h-32 rounded-lg overflow-hidden relative mt-2 border border-slate-200">
+                  <Image src={sliderForm.image} alt="Preview" fill className="object-cover" unoptimized />
+                </div>
+              )}
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">Judul *</label>
+              <Input
+                value={sliderForm.title}
+                onChange={(e) => setSliderForm({ ...sliderForm, title: e.target.value.slice(0, 100) })}
+                placeholder="MLBB Diamond Sale!"
+                className="h-10"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">Subtitle</label>
+              <Input
+                value={sliderForm.subtitle}
+                onChange={(e) => setSliderForm({ ...sliderForm, subtitle: e.target.value.slice(0, 200) })}
+                placeholder="Diskon hingga 30%"
+                className="h-10"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">Game Slug</label>
+                <Input
+                  value={sliderForm.gameSlug}
+                  onChange={(e) => setSliderForm({ ...sliderForm, gameSlug: e.target.value.replace(/[^a-z0-9-]/gi, '-').slice(0, 100) })}
+                  placeholder="mobile-legends-bang-bang"
+                  className="h-10"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-700">Urutan</label>
+                <Input
+                  type="number"
+                  value={sliderForm.order || 0}
+                  onChange={(e) => setSliderForm({ ...sliderForm, order: Number(e.target.value) || 0 })}
+                  placeholder="0"
+                  className="h-10"
+                />
+              </div>
+            </div>
+            {editingSlider && (
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={sliderForm.active}
+                  onChange={(e) => setSliderForm({ ...sliderForm, active: e.target.checked })}
+                  className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm font-medium text-slate-700">Aktif</span>
+              </label>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSliderDialogOpen(false)} className="h-10">Batal</Button>
+            <Button onClick={handleSaveSlider} disabled={saving} className="bg-blue-600 hover:bg-blue-700 h-10">
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : editingSlider ? 'Update Slider' : 'Tambah Slider'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ─── Delete Confirmation Dialog ────────────────── */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent className="bg-white text-slate-900 max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Hapus</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-slate-600">
+            Apakah Anda yakin ingin menghapus <span className="font-semibold text-slate-900">{deleteTarget?.name}</span>?
+            Tindakan ini tidak dapat dibatalkan.
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} className="h-10">Batal</Button>
+            <Button onClick={handleDeleteConfirm} className="bg-red-600 hover:bg-red-700 h-10">
+              <Trash2 className="w-4 h-4 mr-1" /> Hapus
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
@@ -1317,6 +1949,7 @@ function Footer() {
 
   return (
     <footer className="bg-gradient-to-b from-slate-900 to-slate-950 text-white mt-8">
+      <AdBanner />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Brand */}
@@ -1455,9 +2088,6 @@ export default function Page() {
       const hash = window.location.hash.replace('#', '')
       if (hash === 'admin') setCurrentView('admin')
       else if (hash === 'admin-dashboard') setCurrentView('admin-dashboard')
-      else if (hash.startsWith('game/')) {
-        // Not used directly, kept for extensibility
-      }
     }
     handleHash()
     window.addEventListener('hashchange', handleHash)
@@ -1509,6 +2139,7 @@ export default function Page() {
               <div className="max-w-7xl mx-auto px-4 sm:px-6">
                 <HeroSlider />
               </div>
+              <AdBanner />
               <GameGrid />
             </motion.div>
           )}

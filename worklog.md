@@ -1,28 +1,27 @@
 ---
-Task ID: 1
+Task ID: 2
 Agent: Main
-Task: Build full-stack game top-up website (ZallTopUp)
+Task: Add game images, enhance admin dashboard, integrate ad monetization
 
 Work Log:
-- Defined Prisma schema with 7 models: Game, Nominal, Slider, Transaction, Settings, OnlineUser, LoginAttempt
-- Pushed schema to SQLite database via Prisma
-- Created seed API route (`/api/seed`) with 64 games, 397 nominals, 4 sliders, 4 settings
-- Built 13 API routes: products, products/[id], slider, transactions, transactions/[id], settings, admin/login, admin/stats, admin/transactions, admin/products, admin/slider, online, cleanup
-- Implemented brute force protection (5 attempts/15min lockout, IP-based) on admin login
-- Created Zustand store for client state management
-- Built comprehensive single-page app in page.tsx with 5 views: Home, Game Detail, History, Admin Login, Admin Dashboard
-- Implemented all UI components: Header, HeroSlider, GameGrid, GameCard, TopUpForm, TransactionHistory, AdminLogin, AdminDashboard, Footer
-- Added input sanitization (HTML entity escaping) on all user inputs
-- Updated layout.tsx with full SEO meta tags (OpenGraph, Twitter Cards, robots directives)
-- Created robots.txt and sitemap.xml in public/
-- All lint checks pass with zero errors
+- Generated 28 game card images (1024x1024) using AI image generation CLI
+- Generated 4 banner images (1344x768) for hero slider
+- Updated seed data: 28 games with real image paths, 37 with emoji fallback
+- Added Valorant as new game (popular, 7 VP nominals)
+- Updated 4 slider entries with real banner image URLs
+- Rewrote page.tsx with:
+  - Image support in GameCard (next/image with fallback to emoji)
+  - Banner images in HeroSlider with overlay gradient
+  - Fully functional Admin Dashboard with CRUD for products and sliders
+  - Product dialog: add/edit name, slug, image URL, category, nominals
+  - Slider dialog: add/edit image URL, title, subtitle, game slug, order
+  - Ad monetization integration (AdBanner component with script injection)
+  - Game detail image in TopUpForm header
+- Build passes with zero errors, lint clean
 
 Stage Summary:
-- 64 games across 9 categories with 397 nominals seeded
-- Realtime polling (every 15s) for data updates
-- Online user tracking with 5-minute heartbeat
-- Admin dashboard accessible via `/#admin` hash route
-- Professional Codashop-inspired UI with blue/black/green color scheme
-- Mobile-first responsive design with Framer Motion animations
-- Security: brute force protection, input sanitization, hidden admin page
-- SEO: meta tags, OpenGraph, robots.txt, sitemap.xml
+- 28 real game images + 4 banner images generated via AI
+- Admin can now add/edit/delete products with image URLs and nominal management
+- Admin can now add/edit/delete sliders with image URLs
+- Ad monetization code integrated below slider and above footer
+- All data served from database (no hardcoding)

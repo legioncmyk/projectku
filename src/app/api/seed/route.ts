@@ -27,7 +27,7 @@ const gamesData: GameInput[] = [
   {
     name: "Mobile Legends: Bang Bang",
     slug: "mobile-legends-bang-bang",
-    image: "🎮",
+    image: "/games/mobile-legends-bang-bang.png",
     category: "MOBA",
     popular: true,
     nominals: [
@@ -49,7 +49,7 @@ const gamesData: GameInput[] = [
   {
     name: "League of Legends: Wild Rift",
     slug: "league-of-legends-wild-rift",
-    image: "🎮",
+    image: "/games/league-of-legends-wild-rift.png",
     category: "MOBA",
     popular: false,
     nominals: [
@@ -66,7 +66,7 @@ const gamesData: GameInput[] = [
   {
     name: "Arena of Valor",
     slug: "arena-of-valor",
-    image: "🎮",
+    image: "/games/arena-of-valor.png",
     category: "MOBA",
     popular: false,
     nominals: [
@@ -118,7 +118,7 @@ const gamesData: GameInput[] = [
   {
     name: "Free Fire",
     slug: "free-fire",
-    image: "🔫",
+    image: "/games/free-fire.png",
     category: "Battle Royale",
     popular: true,
     nominals: [
@@ -133,7 +133,7 @@ const gamesData: GameInput[] = [
   {
     name: "PUBG Mobile",
     slug: "pubg-mobile",
-    image: "🔫",
+    image: "/games/pubg-mobile.png",
     category: "Battle Royale",
     popular: true,
     nominals: [
@@ -148,7 +148,7 @@ const gamesData: GameInput[] = [
   {
     name: "Call of Duty Mobile",
     slug: "call-of-duty-mobile",
-    image: "🔫",
+    image: "/games/call-of-duty-mobile.png",
     category: "Battle Royale",
     popular: false,
     nominals: [
@@ -178,7 +178,7 @@ const gamesData: GameInput[] = [
   {
     name: "Farlight 84",
     slug: "farlight-84",
-    image: "🔫",
+    image: "/games/farlight-84.png",
     category: "Battle Royale",
     popular: false,
     nominals: [
@@ -191,13 +191,30 @@ const gamesData: GameInput[] = [
     ],
   },
 
+  {
+    name: "Valorant",
+    slug: "valorant",
+    image: "/games/valorant.png",
+    category: "Battle Royale",
+    popular: true,
+    nominals: [
+      { name: "125 VP", price: 15000 },
+      { name: "420 VP", price: 49000, originalPrice: 52500 },
+      { name: "700 VP", price: 79000, originalPrice: 87500 },
+      { name: "1375 VP", price: 149000, originalPrice: 171875 },
+      { name: "2400 VP", price: 249000, originalPrice: 300000 },
+      { name: "4000 VP", price: 399000, originalPrice: 500000 },
+      { name: "8150 VP", price: 799000, originalPrice: 1018750 },
+    ],
+  },
+
   // ──────────────────────────────────────────────
   // GACHA / RPG (⚔️)
   // ──────────────────────────────────────────────
   {
     name: "Genshin Impact",
     slug: "genshin-impact",
-    image: "⚔️",
+    image: "/games/genshin-impact.png",
     category: "RPG",
     popular: true,
     nominals: [
@@ -212,7 +229,7 @@ const gamesData: GameInput[] = [
   {
     name: "Honkai: Star Rail",
     slug: "honkai-star-rail",
-    image: "⚔️",
+    image: "/games/honkai-star-rail.png",
     category: "RPG",
     popular: true,
     nominals: [
@@ -227,7 +244,7 @@ const gamesData: GameInput[] = [
   {
     name: "Honkai Impact 3rd",
     slug: "honkai-impact-3rd",
-    image: "⚔️",
+    image: "/games/honkai-impact-3rd.png",
     category: "RPG",
     popular: false,
     nominals: [
@@ -242,7 +259,7 @@ const gamesData: GameInput[] = [
   {
     name: "Wuthering Waves",
     slug: "wuthering-waves",
-    image: "⚔️",
+    image: "/games/wuthering-waves.png",
     category: "RPG",
     popular: false,
     nominals: [
@@ -257,7 +274,7 @@ const gamesData: GameInput[] = [
   {
     name: "Zenless Zone Zero",
     slug: "zenless-zone-zero",
-    image: "⚔️",
+    image: "/games/zenless-zone-zero.png",
     category: "RPG",
     popular: false,
     nominals: [
@@ -272,7 +289,7 @@ const gamesData: GameInput[] = [
   {
     name: "Tower of Fantasy",
     slug: "tower-of-fantasy",
-    image: "⚔️",
+    image: "/games/tower-of-fantasy.png",
     category: "RPG",
     popular: false,
     nominals: [
@@ -287,7 +304,7 @@ const gamesData: GameInput[] = [
   {
     name: "Punishing: Gray Raven",
     slug: "punishing-gray-raven",
-    image: "⚔️",
+    image: "/games/punishing-gray-raven.png",
     category: "RPG",
     popular: false,
     nominals: [
@@ -302,7 +319,7 @@ const gamesData: GameInput[] = [
   {
     name: "Arknights",
     slug: "arknights",
-    image: "⚔️",
+    image: "/games/arknights.png",
     category: "RPG",
     popular: false,
     nominals: [
@@ -317,7 +334,7 @@ const gamesData: GameInput[] = [
   {
     name: "Fate/Grand Order",
     slug: "fate-grand-order",
-    image: "⚔️",
+    image: "/games/fate-grand-order.png",
     category: "RPG",
     popular: false,
     nominals: [
@@ -332,7 +349,7 @@ const gamesData: GameInput[] = [
   {
     name: "Epic Seven",
     slug: "epic-seven",
-    image: "⚔️",
+    image: "/games/epic-seven.png",
     category: "RPG",
     popular: false,
     nominals: [
@@ -348,7 +365,7 @@ const gamesData: GameInput[] = [
   {
     name: "Summoners War",
     slug: "summoners-war",
-    image: "⚔️",
+    image: "/games/summoners-war.png",
     category: "RPG",
     popular: false,
     nominals: [
@@ -408,7 +425,7 @@ const gamesData: GameInput[] = [
   {
     name: "Dragon Ball Legends",
     slug: "dragon-ball-legends",
-    image: "⚔️",
+    image: "/games/dragon-ball-legends.png",
     category: "RPG",
     popular: false,
     nominals: [
@@ -427,7 +444,7 @@ const gamesData: GameInput[] = [
   {
     name: "Clash of Clans",
     slug: "clash-of-clans",
-    image: "🏰",
+    image: "/games/clash-of-clans.png",
     category: "Strategy",
     popular: true,
     nominals: [
@@ -442,7 +459,7 @@ const gamesData: GameInput[] = [
   {
     name: "Clash Royale",
     slug: "clash-royale",
-    image: "🏰",
+    image: "/games/clash-royale.png",
     category: "Strategy",
     popular: false,
     nominals: [
@@ -457,7 +474,7 @@ const gamesData: GameInput[] = [
   {
     name: "Rise of Kingdoms",
     slug: "rise-of-kingdoms",
-    image: "🏰",
+    image: "/games/rise-of-kingdoms.png",
     category: "Strategy",
     popular: false,
     nominals: [
@@ -472,7 +489,7 @@ const gamesData: GameInput[] = [
   {
     name: "Lords Mobile",
     slug: "lords-mobile",
-    image: "🏰",
+    image: "/games/lords-mobile.png",
     category: "Strategy",
     popular: false,
     nominals: [
@@ -551,7 +568,7 @@ const gamesData: GameInput[] = [
   {
     name: "Ragnarok M: Eternal Love",
     slug: "ragnarok-m-eternal-love",
-    image: "🌍",
+    image: "/games/ragnarok-m-eternal-love.png",
     category: "MMORPG",
     popular: false,
     nominals: [
@@ -581,7 +598,7 @@ const gamesData: GameInput[] = [
   {
     name: "Black Desert Mobile",
     slug: "black-desert-mobile",
-    image: "🌍",
+    image: "/games/black-desert-mobile.png",
     category: "MMORPG",
     popular: false,
     nominals: [
@@ -675,7 +692,7 @@ const gamesData: GameInput[] = [
   {
     name: "Brawl Stars",
     slug: "brawl-stars",
-    image: "💥",
+    image: "/games/brawl-stars.png",
     category: "Action",
     popular: true,
     nominals: [
@@ -720,7 +737,7 @@ const gamesData: GameInput[] = [
   {
     name: "Solo Leveling: Arise",
     slug: "solo-leveling-arise",
-    image: "💥",
+    image: "/games/solo-leveling-arise.png",
     category: "Action",
     popular: false,
     nominals: [
@@ -1036,7 +1053,7 @@ const gamesData: GameInput[] = [
 // ──────────────────────────────────────────────
 const slidersData = [
   {
-    image: "🎮",
+    image: "/banners/mlbb-diamond-sale.png",
     title: "MLBB Diamond Sale!",
     subtitle: "Diskon hingga 30% untuk semua diamond MLBB",
     gameSlug: "mobile-legends-bang-bang",
@@ -1044,7 +1061,7 @@ const slidersData = [
     active: true,
   },
   {
-    image: "🔫",
+    image: "/banners/free-fire-promo.png",
     title: "Free Fire Top Up Murah",
     subtitle: "Top up FF tercepat dan termurah se-Indonesia",
     gameSlug: "free-fire",
@@ -1052,7 +1069,7 @@ const slidersData = [
     active: true,
   },
   {
-    image: "⚔️",
+    image: "/banners/genshin-impact-promo.png",
     title: "Genshin Impact Promo",
     subtitle: "Beli Genesis Crystals dengan harga spesial",
     gameSlug: "genshin-impact",
@@ -1060,7 +1077,7 @@ const slidersData = [
     active: true,
   },
   {
-    image: "🔫",
+    image: "/banners/pubg-mobile-uc.png",
     title: "PUBG Mobile UC",
     subtitle: "Top up UC PUBG Mobile proses instan",
     gameSlug: "pubg-mobile",
